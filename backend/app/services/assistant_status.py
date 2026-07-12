@@ -1,0 +1,15 @@
+class AssistantStatus:
+
+    IDLE = "IDLE"
+
+    ACTIVATED = "ACTIVATED"
+
+    LISTENING = "LISTENING"
+
+    THINKING = "THINKING"
+
+    SPEAKING = "SPEAKING"
+
+    PROCESSING_PDF = "PROCESSING_PDF"
+
+    ERROR = "ERROR"

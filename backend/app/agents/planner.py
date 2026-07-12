@@ -8,6 +8,7 @@ from app.prompts import PLANNER_PROMPT
 class Planner:
 
     def __init__(self):
+
         self.llm = ChatGoogleGenerativeAI(
             model="gemini-2.5-flash",
             google_api_key=settings.GEMINI_API_KEY,
@@ -16,20 +17,39 @@ class Planner:
 
     def plan(self, user_request: str) -> str:
 
-        messages = [
-            HumanMessage(
-                content=f"""
+        prompt = f"""
 {PLANNER_PROMPT}
 
 User Request:
+
 {user_request}
+
+Tool:
 """
-            )
-        ]
 
-        response = self.llm.invoke(messages)
+        response = self.llm.invoke(
+            [
+                HumanMessage(content=prompt)
+            ]
+        )
 
-        return response.content.strip().lower()
+        tool = response.content.strip().lower()
+
+        allowed_tools = {
+            "general",
+            "question_answer",
+            "summarize",
+            "translate",
+            "pdf_writer",
+            "txt_writer",
+            "web_search",
+        }
+
+        if tool not in allowed_tools:
+
+            tool = "general"
+
+        return tool
 
 
 planner = Planner()
