@@ -15,7 +15,7 @@ class Planner:
             temperature=0,
         )
 
-    def plan(self, user_request: str) -> str:
+    def plan(self, user_request: str):
 
         prompt = f"""
 {PLANNER_PROMPT}
@@ -29,7 +29,9 @@ Tool:
 
         response = self.llm.invoke(
             [
-                HumanMessage(content=prompt)
+                HumanMessage(
+                    content=prompt
+                )
             ]
         )
 
@@ -43,10 +45,13 @@ Tool:
             "pdf_writer",
             "txt_writer",
             "web_search",
+            "system_control",
+            "file_manager",
+            "camera_reader",
+            "vision_reader",
         }
 
         if tool not in allowed_tools:
-
             tool = "general"
 
         return tool

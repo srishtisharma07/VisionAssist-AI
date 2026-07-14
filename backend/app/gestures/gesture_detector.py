@@ -4,7 +4,6 @@ import cv2
 import mediapipe as mp
 
 from app.services.assistant_state import assistant_state
-from app.services.assistant_status import AssistantStatus
 from app.services.listener_service import listener_service
 from app.speech.text_to_speech import text_to_speech
 
@@ -23,9 +22,8 @@ class GestureDetector:
             min_tracking_confidence=0.7,
         )
 
-        self.last_gesture = ""
-
-        self.gesture_locked = False
+        self.last_gesture_time = 0
+        self.cooldown = 1.0
 
     # ----------------------------------------------------
 
@@ -33,11 +31,13 @@ class GestureDetector:
 
         fingers = []
 
+        # Thumb
         if landmarks[4].x < landmarks[3].x:
             fingers.append(1)
         else:
             fingers.append(0)
 
+        # Index, Middle, Ring, Little
         for tip in [8, 12, 16, 20]:
 
             if landmarks[tip].y < landmarks[tip - 2].y:
@@ -82,7 +82,13 @@ class GestureDetector:
 
         print(f"\nDetected Gesture: {gesture}")
 
+        # -----------------------------
+        # OPEN PALM
+        # -----------------------------
         if gesture == "OPEN PALM":
+
+            if assistant_state.active:
+                return
 
             assistant_state.activate()
 
@@ -90,7 +96,13 @@ class GestureDetector:
             print("Assistant Activated")
             print("==============================")
 
+        # -----------------------------
+        # FIST
+        # -----------------------------
         elif gesture == "FIST":
+
+            if not assistant_state.active:
+                return
 
             text_to_speech.stop()
 
@@ -100,17 +112,16 @@ class GestureDetector:
             print("Assistant Deactivated")
             print("==============================")
 
+        # -----------------------------
+        # INDEX
+        # -----------------------------
         elif gesture == "INDEX":
 
-            if assistant_state.get_status() != AssistantStatus.ACTIVATED:
+            if not assistant_state.active:
 
                 print("Assistant is inactive.")
 
                 return
-
-            print("\n==============================")
-            print("Voice Assistant Started")
-            print("==============================")
 
             listener_service.start()
 
@@ -156,18 +167,18 @@ class GestureDetector:
                     fingers
                 )
 
-                if not self.gesture_locked:
+                current_time = time.time()
+
+                if (
+                    gesture
+                    and current_time - self.last_gesture_time >= self.cooldown
+                ):
 
                     self.process_gesture(
                         gesture
                     )
 
-                    if gesture:
-                        self.gesture_locked = True
-
-            else:
-
-                self.gesture_locked = False
+                    self.last_gesture_time = current_time
 
             cv2.putText(
                 frame,

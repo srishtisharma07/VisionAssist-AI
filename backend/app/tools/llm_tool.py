@@ -2,7 +2,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage
 
 from app.config.settings import settings
-from app.prompts.pdf_prompt import build_pdf_prompt
 from app.services.assistant_state import assistant_state
 
 
@@ -16,15 +15,81 @@ class LLMTool:
             temperature=0.3,
         )
 
+    # =======================================================
+    # Safe Gemini Call
+    # =======================================================
+
     def _invoke(self, prompt: str) -> str:
 
-        response = self.llm.invoke(
-            [
-                HumanMessage(content=prompt)
-            ]
-        )
+        try:
 
-        return response.content.strip()
+            response = self.llm.invoke(
+                [
+                    HumanMessage(content=prompt)
+                ]
+            )
+
+            return response.content.strip()
+
+        except Exception as e:
+
+            error = str(e).lower()
+
+            # ------------------------------------
+            # Quota Exceeded
+            # ------------------------------------
+
+            if (
+                "resource_exhausted" in error
+                or "429" in error
+                or "quota" in error
+            ):
+
+                return (
+                    "Gemini API quota has been exceeded.\n\n"
+                    "Please use another API key or wait until "
+                    "the quota resets."
+                )
+
+            # ------------------------------------
+            # Invalid API Key
+            # ------------------------------------
+
+            if (
+                "api_key_invalid" in error
+                or "invalid api key" in error
+                or "permission_denied" in error
+            ):
+
+                return (
+                    "Invalid Gemini API Key.\n"
+                    "Please update the API key."
+                )
+
+            # ------------------------------------
+            # Network Error
+            # ------------------------------------
+
+            if (
+                "connection" in error
+                or "timeout" in error
+                or "network" in error
+            ):
+
+                return (
+                    "Unable to connect to Gemini.\n"
+                    "Please check your internet connection."
+                )
+
+            # ------------------------------------
+            # Unknown Error
+            # ------------------------------------
+
+            return f"Gemini Error:\n{str(e)}"
+
+    # =======================================================
+    # Summarize
+    # =======================================================
 
     def summarize(self, text: str) -> str:
 
@@ -40,6 +105,10 @@ TEXT:
 
         return self._invoke(prompt)
 
+    # =======================================================
+    # Translate
+    # =======================================================
+
     def translate(self, text: str) -> str:
 
         prompt = f"""
@@ -52,34 +121,11 @@ TEXT:
 
         return self._invoke(prompt)
 
+    # =======================================================
+    # General Conversation
+    # =======================================================
+
     def answer_question(self, question: str) -> str:
-
-        history = assistant_state.build_history()
-
-        prompt = f"""
-You are VisionAssist AI.
-
-Below is the previous conversation.
-
-{history}
-
-Current User Question:
-
-{question}
-
-Instructions:
-
-- Use previous conversation whenever useful.
-- If the current question refers to previous answers using words like
-  "it", "that", "this", "previous", "explain more",
-  understand the context.
-- If there is no previous context, answer normally.
-- Give clear and concise answers.
-"""
-
-        return self._invoke(prompt)
-
-    def answer_from_pdf(self, pdf_text: str, question: str) -> str:
 
         history = assistant_state.build_history()
 
@@ -90,7 +136,42 @@ Conversation History:
 
 {history}
 
-Answer ONLY using the PDF below.
+Current User Question:
+
+{question}
+
+Instructions:
+
+- Use previous conversation whenever useful.
+- If the user refers to previous messages using words like
+  "it", "that", "this", "previous",
+  understand the context.
+- Otherwise answer normally.
+- Keep responses concise and helpful.
+"""
+
+        return self._invoke(prompt)
+
+    # =======================================================
+    # PDF Question Answering
+    # =======================================================
+
+    def answer_from_pdf(
+        self,
+        pdf_text: str,
+        question: str,
+    ) -> str:
+
+        history = assistant_state.build_history()
+
+        prompt = f"""
+You are VisionAssist AI.
+
+Conversation History:
+
+{history}
+
+Answer ONLY using the uploaded PDF.
 
 PDF:
 
@@ -100,10 +181,10 @@ Question:
 
 {question}
 
-If the answer is not present in the PDF,
-say:
+If the answer does not exist inside the PDF,
+reply exactly:
 
-"I could not find this information in the uploaded PDF."
+I could not find this information in the uploaded PDF.
 
 Use previous conversation if needed.
 """

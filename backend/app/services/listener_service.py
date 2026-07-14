@@ -33,9 +33,7 @@ class ListenerService:
             AssistantStatus.LISTENING
         )
 
-        print("\n==============================")
-        print("Voice Assistant Started")
-        print("==============================")
+        
 
         Thread(
             target=self.listen_loop,
