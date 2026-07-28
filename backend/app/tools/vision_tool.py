@@ -6,6 +6,7 @@ from google import genai
 from google.genai import types
 
 from app.config import settings
+from app.services.assistant_state import assistant_state
 
 
 class VisionTool:
@@ -27,24 +28,17 @@ class VisionTool:
 
     def capture_image(self):
 
-        camera = cv2.VideoCapture(0)
+        frame = assistant_state.get_current_frame()
 
-        if not camera.isOpened():
-
-            return None
-
-        success, frame = camera.read()
-
-        camera.release()
-
-        if not success:
-
+        if frame is None:
             return None
 
         cv2.imwrite(
             str(self.image_path),
             frame,
         )
+
+        print("Using current camera frame.")
 
         return self.image_path
 
@@ -55,31 +49,63 @@ class VisionTool:
         image_path = self.capture_image()
 
         if image_path is None:
-
-            return "Unable to capture image."
+            return "Camera frame not available."
 
         with open(image_path, "rb") as image:
 
             image_bytes = image.read()
 
-        response = self.client.models.generate_content(
+        prompt = """
+You are VisionAssist AI for visually impaired users.
 
-            model="gemini-2.5-flash",
+Describe the surroundings briefly.
 
-            contents=[
+Rules:
+- Maximum 3-4 short sentences.
+- Mention important objects.
+- Mention people if present.
+- Mention furniture if present.
+- Mention obstacles if present.
+- Mention readable text if clearly visible.
+- Do NOT describe facial expressions.
+- Do NOT describe clothing.
+- Keep the answer concise.
+"""
 
-                types.Part.from_bytes(
-                    data=image_bytes,
-                    mime_type="image/jpeg",
-                ),
+        try:
 
-                "Describe everything visible in this image in detail."
+            response = self.client.models.generate_content(
 
-            ]
+                model="gemini-2.5-flash",
 
-        )
+                contents=[
 
-        return response.text
+                    types.Part.from_bytes(
+                        data=image_bytes,
+                        mime_type="image/jpeg",
+                    ),
+
+                    prompt,
+
+                ],
+
+            )
+
+            if (
+                response is None
+                or response.text is None
+                or not response.text.strip()
+            ):
+                return "I couldn't understand the scene."
+
+            return response.text.strip()
+
+        except Exception as e:
+
+            print("\nVision Error:")
+            print(e)
+
+            return "Sorry, Vision AI is temporarily unavailable."
 
 
 vision_tool = VisionTool()

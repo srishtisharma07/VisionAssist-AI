@@ -1,65 +1,73 @@
+from pathlib import Path
 import cv2
+import numpy as np
+import time
+import inspect
 
+from app.services.assistant_state import assistant_state
+from app.speech.text_to_speech import text_to_speech
 from app.tools.ocr_tool import ocr_tool
+
+# Debugging assistant_state.start_ocr_scan signature
+print(f"Signature of assistant_state.start_ocr_scan: {inspect.signature(assistant_state.start_ocr_scan)}")
 
 
 class CameraTool:
 
+    def __init__(self):
+        self.image_path = Path("uploads/ocr_image.jpg")
+        self.image_path.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+    def calculate_sharpness(self, image):
+        gray = cv2.cvtColor(
+            image,
+            cv2.COLOR_BGR2GRAY,
+        )
+
+        return cv2.Laplacian(
+            gray,
+            cv2.CV_64F,
+        ).var()
+
     def capture_text(self):
+        # Clear previous capture
+        assistant_state.clear_ocr_capture()
 
-        cap = cv2.VideoCapture(0)
+        # Start OCR scan
+        assistant_state.start_ocr_scan(duration=3)
 
-        if not cap.isOpened():
-            return None
+        print("\nWaiting for document scan...\n")
 
-        print("\n===================================")
-        print("SPACE -> Capture Document")
-        print("ESC   -> Cancel")
-        print("===================================\n")
+        # Wait until gesture detector captures the image
+        while assistant_state.is_ocr_scan_active():
+            time.sleep(0.1)
 
-        extracted_text = None
+        # Get captured image
+        frame = assistant_state.get_ocr_capture()
+        
+        # Save the captured scan for verification
+        cv2.imwrite("captured_scan.jpg", frame)
 
-        while True:
+        if frame is None:
+            return "No document was captured."
 
-            success, frame = cap.read()
+        # Save for debugging
+        cv2.imwrite(str(self.image_path), frame)
 
-            if not success:
-                continue
+        try:
+            text = ocr_tool.read_image(frame)
 
-            cv2.putText(
-                frame,
-                "SPACE = Capture | ESC = Cancel",
-                (20, 40),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.8,
-                (0, 255, 0),
-                2,
-            )
+            if not text.strip():
+                return "No readable text found."
 
-            cv2.imshow(
-                "VisionAssist OCR",
-                frame,
-            )
+            assistant_state.set_current_document(text)
+            return text
 
-            key = cv2.waitKey(1) & 0xFF
-
-            if key == 32:
-
-                extracted_text = ocr_tool.read_image(
-                    frame
-                )
-
-                break
-
-            elif key == 27:
-
-                break
-
-        cap.release()
-
-        cv2.destroyAllWindows()
-
-        return extracted_text
-
+        except Exception as e:
+            print(f"OCR Error: {e}")
+            return "Unable to read the document."
 
 camera_tool = CameraTool()

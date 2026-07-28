@@ -1,81 +1,76 @@
 import os
 import tempfile
 import threading
-
-from gtts import gTTS
 import pygame
-
+from gtts import gTTS
 
 class TextToSpeech:
 
     def __init__(self):
-
         pygame.mixer.init()
-
         self.current_file = None
-
         self.lock = threading.Lock()
 
-    def speak(self, text: str):
+    # -----------------------------------------
 
+    def speak(self, text: str, on_complete=None):
         if not text:
             return
 
+        import threading
+
         thread = threading.Thread(
             target=self._play_audio,
-            args=(text,),
+            args=(text, on_complete),
             daemon=True,
         )
 
         thread.start()
 
-    def _play_audio(self, text: str):
+    # -----------------------------------------
+
+    def _play_audio(self, text: str, on_complete=None):
+        self.stop()
+
+        fd, path = tempfile.mkstemp(suffix=".mp3")
+        os.close(fd)
 
         try:
+            tts = gTTS(
+                text=text,
+                lang="en",
+            )
 
-            with self.lock:
+            tts.save(path)
 
-                self.stop()
+            self.current_file = path
 
-                fd, path = tempfile.mkstemp(suffix=".mp3")
-                os.close(fd)
+            pygame.mixer.music.load(path)
 
-                tts = gTTS(
-                    text=text,
-                    lang="en",
-                )
-
-                tts.save(path)
-
-                self.current_file = path
-
-                pygame.mixer.music.load(path)
-
-                pygame.mixer.music.play()
+            pygame.mixer.music.play()
 
             while pygame.mixer.music.get_busy():
                 pygame.time.wait(100)
 
         finally:
+            pygame.mixer.music.stop()
 
-            with self.lock:
+            if os.path.exists(path):
+                try:
+                    os.remove(path)
+                except:
+                    pass
 
-                pygame.mixer.music.stop()
+            self.current_file = None
 
-                if (
-                    self.current_file
-                    and os.path.exists(self.current_file)
-                ):
-                    try:
-                        os.remove(self.current_file)
-                    except Exception:
-                        pass
+            if on_complete:
+                on_complete()
 
-                self.current_file = None
+    # -----------------------------------------
 
     def stop(self):
-
-        pygame.mixer.music.stop()
+        if pygame.mixer.music.get_busy():
+            pygame.mixer.music.stop()
 
 
 text_to_speech = TextToSpeech()

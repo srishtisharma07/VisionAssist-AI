@@ -1,4 +1,5 @@
 from langgraph.graph import END, StateGraph
+import traceback
 
 from app.agents.planner import planner
 from app.agents.state import AgentState
@@ -12,6 +13,7 @@ from app.tools.system_tool import system_tool
 from app.tools.camera_tool import camera_tool
 from app.tools.file_tool import file_tool
 from app.tools.vision_tool import vision_tool
+from app.tools.document_reader import document_reader
 
 from app.services.assistant_state import assistant_state
 
@@ -20,9 +22,45 @@ from app.services.assistant_state import assistant_state
 # Planner Node
 # ============================================================
 
+ALLOWED_TOOLS = {
+    "general",
+    "question_answer",
+    "summarize",
+    "translate",
+    "pdf_writer",
+    "txt_writer",
+    "web_search",
+    "system_control",
+    "camera_reader",
+    "file_manager",
+    "vision_reader",
+    "document_chat",
+}
+
+
 def planner_node(state: AgentState):
 
-    selected_tool = planner.plan(state["user_input"])
+    user_input = state["user_input"]
+
+    try:
+
+        selected_tool = planner.plan(
+            user_input
+        ).strip()
+
+    except Exception as e:
+
+        print("\nPlanner Error:")
+        print(e)
+
+        selected_tool = "general"
+
+    if selected_tool not in ALLOWED_TOOLS:
+
+        print("\nInvalid planner output:")
+        print(selected_tool)
+
+        selected_tool = "general"
 
     print("\n" + "=" * 60)
     print("PLANNER SELECTED:", selected_tool)
@@ -42,183 +80,197 @@ def tool_node(state: AgentState):
     tool = state["selected_tool"]
     user_input = state["user_input"]
 
-    # ---------------------------------------------------------
-    # Summarize Uploaded PDF
-    # ---------------------------------------------------------
+    response = ""
 
-    if tool == "summarize":
+    try:
 
-        pdf_text = pdf_tool.get_latest_pdf_text()
+        # =====================================================
+        # PDF SUMMARY
+        # =====================================================
 
-        if not pdf_text.strip():
+        if tool == "summarize":
 
-            response = "No PDF has been uploaded."
+            pdf_text = pdf_tool.get_latest_pdf_text()
 
-        else:
+            if not pdf_text.strip():
 
-            response = llm_tool.summarize(pdf_text)
+                response = "No PDF has been uploaded."
 
-    # ---------------------------------------------------------
-    # Question Answering From PDF
-    # ---------------------------------------------------------
+            else:
 
-    elif tool == "question_answer":
+                response = llm_tool.summarize(
+                    pdf_text
+                )
 
-        pdf_text = pdf_tool.get_latest_pdf_text()
+        # =====================================================
+        # PDF QUESTION ANSWERING
+        # =====================================================
 
-        if not pdf_text.strip():
+        elif tool == "question_answer":
 
-            response = "No PDF has been uploaded."
+            pdf_text = pdf_tool.get_latest_pdf_text()
 
-        else:
+            if not pdf_text.strip():
 
-            response = llm_tool.answer_from_pdf(
-                pdf_text=pdf_text,
-                question=user_input,
+                response = "No PDF has been uploaded."
+
+            else:
+
+                response = llm_tool.answer_from_pdf(
+                    pdf_text,
+                    user_input,
+                )
+
+        # =====================================================
+        # GENERAL CHAT
+        # =====================================================
+
+        elif tool == "general":
+
+            response = llm_tool.answer_question(
+                user_input
             )
 
-    # ---------------------------------------------------------
-    # General LLM
-    # ---------------------------------------------------------
+        # =====================================================
+        # WEB SEARCH
+        # =====================================================
 
-    elif tool == "general":
+        elif tool == "web_search":
 
-        response = llm_tool.answer_question(
-            user_input
-        )
+            response = web_tool.search(
+                user_input
+            )
 
-    # ---------------------------------------------------------
-    # Web Search
-    # ---------------------------------------------------------
+        # =====================================================
+        # TRANSLATION
+        # =====================================================
 
-    elif tool == "web_search":
+        elif tool == "translate":
 
-        web_result = web_tool.search(user_input)
+            response = llm_tool.translate(
+                user_input
+            )
 
-        prompt = f"""
-Use the web search result below to answer the user's question.
+        # =====================================================
+        # SAVE PDF
+        # =====================================================
 
-User Question:
-{user_input}
+        elif tool == "pdf_writer":
 
-Web Search Result:
-{web_result}
+            previous = assistant_state.get_last_response()
 
-Provide a clear, concise and accurate answer.
-"""
+            if previous.strip():
 
-        response = llm_tool._invoke(prompt)
+                path = pdf_writer.save(previous)
 
-    # ---------------------------------------------------------
-    # Translation
-    # ---------------------------------------------------------
+                response = (
+                    "PDF saved successfully.\n\n"
+                    f"{path}"
+                )
 
-    elif tool == "translate":
+            else:
 
-        response = llm_tool.translate(
-            user_input
-        )
+                response = "No previous response available."
 
-    # ---------------------------------------------------------
-    # Save Previous Response as PDF
-    # ---------------------------------------------------------
+        # =====================================================
+        # SAVE TXT
+        # =====================================================
 
-    elif tool == "pdf_writer":
+        elif tool == "txt_writer":
 
-        last_response = assistant_state.get_last_response()
+            previous = assistant_state.get_last_response()
 
-        if not last_response.strip():
+            if previous.strip():
 
-            response = "No previous response available."
+                path = txt_writer.save(previous)
+
+                response = (
+                    "TXT saved successfully.\n\n"
+                    f"{path}"
+                )
+
+            else:
+
+                response = "No previous response available."
+
+        # =====================================================
+        # WINDOWS CONTROL
+        # =====================================================
+
+        elif tool == "system_control":
+
+            response = system_tool.execute(
+                user_input
+            )
+
+        # =====================================================
+        # FILE MANAGER
+        # =====================================================
+
+        elif tool == "file_manager":
+
+            response = file_tool.execute(
+                user_input
+            )
+
+        # =====================================================
+        # OCR
+        # =====================================================
+
+        elif tool == "camera_reader":
+
+            response = camera_tool.capture_text()
+
+        # =====================================================
+        # VISION AI
+        # =====================================================
+
+        elif tool == "vision_reader":
+
+            response = vision_tool.describe_scene()
+
+        # =====================================================
+        # DOCUMENT CHAT
+        # =====================================================
+
+        elif tool == "document_chat":
+
+            user_query = state["user_input"].lower()
+
+            if "summar" in user_query:
+                response = document_reader.summarize()
+
+            elif "explain" in user_query:
+                response = document_reader.explain()
+
+            else:
+                response = document_reader.answer(
+                    state["user_input"]
+                )
+
+        # =====================================================
+        # UNKNOWN TOOL
+        # =====================================================
 
         else:
-
-            path = pdf_writer.save(last_response)
 
             response = (
-                "PDF saved successfully.\n\n"
-                f"Location:\n{path}"
+                f"Unknown tool: {tool}"
             )
 
-    # ---------------------------------------------------------
-    # Save Previous Response as TXT
-    # ---------------------------------------------------------
+    except Exception as e:
 
-    elif tool == "txt_writer":
+        print("\n================ ERROR ================")
+        traceback.print_exc()
+        print("=======================================\n")
 
-        last_response = assistant_state.get_last_response()
-
-        if not last_response.strip():
-
-            response = "No previous response available."
-
-        else:
-
-            path = txt_writer.save(last_response)
-
-            response = (
-                "TXT saved successfully.\n\n"
-                f"Location:\n{path}"
-            )
-
-    # ---------------------------------------------------------
-    # Windows System Control
-    # ---------------------------------------------------------
-
-    elif tool == "system_control":
-
-        response = system_tool.execute(
-            user_input
-        )
-
-    # ---------------------------------------------------------
-    # Camera Capture
-    # ---------------------------------------------------------
-
-    elif tool == "camera_reader":
-
-        image = camera_tool.capture()
-
-        if image:
-
-            response = (
-                "Image captured successfully."
-            )
-
-        else:
-
-            response = (
-                "Unable to access the camera."
-            )
-
-    # ---------------------------------------------------------
-    # File Manager
-    # ---------------------------------------------------------
-
-    elif tool == "file_manager":
-
-        response = file_tool.execute(
-            user_input
-        )
-
-    # ---------------------------------------------------------
-    # Vision AI
-    # ---------------------------------------------------------
-
-    elif tool == "vision_reader":
-
-        response = vision_tool.describe_scene()
-
-    # ---------------------------------------------------------
-    # Unknown Tool
-    # ---------------------------------------------------------
-
-    else:
-
-        response = "Unknown tool selected."
+        response = str(e)
 
     print("\n" + "=" * 60)
     print("TOOL EXECUTED:", tool)
+    print("=" * 60)
+    print("Response:")
+    print(response)
     print("=" * 60 + "\n")
 
     assistant_state.add_conversation(
@@ -240,10 +292,12 @@ Provide a clear, concise and accurate answer.
 
 
 # ============================================================
-# Graph
+# LangGraph
 # ============================================================
 
-builder = StateGraph(AgentState)
+builder = StateGraph(
+    AgentState
+)
 
 builder.add_node(
     "planner",

@@ -26,3 +26,14 @@ backend/app/outputs/*
 # OS
 .DS_Store
 Thumbs.db
+# Backup files
+*.zip
+
+# Temporary OCR images
+backend/captured_scan.jpg
+backend/ocr_input.jpg
+backend/ocr_processed.jpg
+
+# Recovery folders
+backend-old-working/
+recovery-test/

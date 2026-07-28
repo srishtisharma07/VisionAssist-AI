@@ -6,6 +6,8 @@ class AssistantStatus:
 
     LISTENING = "LISTENING"
 
+    CONFIRMING = "CONFIRMING"
+
     THINKING = "THINKING"
 
     SPEAKING = "SPEAKING"

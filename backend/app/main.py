@@ -1,7 +1,9 @@
 from threading import Thread
+import cv2
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
 from app.agents.orchestrator import agent
 from app.gestures.gesture_detector import GestureDetector
@@ -27,7 +29,6 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup_event():
-
     detector = GestureDetector()
 
     Thread(
@@ -42,7 +43,6 @@ app.include_router(speech_router)
 
 @app.get("/")
 def home():
-
     return {
         "message": "VisionAssist AI Backend Running"
     }
@@ -50,13 +50,36 @@ def home():
 
 @app.get("/state")
 def get_state():
-
     return assistant_state.get_state()
 
 
 @app.get("/agent")
 def run_agent(command: str):
-
     result = agent.execute(command)
-
     return result
+
+
+def generate_frames():
+    while True:
+        frame = assistant_state.get_current_frame()
+
+        if frame is None:
+            continue
+
+        _, buffer = cv2.imencode(".jpg", frame)
+        frame_bytes = buffer.tobytes()
+
+        yield (
+            b"--frame\r\n"
+            b"Content-Type: image/jpeg\r\n\r\n"
+            + frame_bytes
+            + b"\r\n"
+        )
+
+
+@app.get("/video_feed")
+def video_feed():
+    return StreamingResponse(
+        generate_frames(),
+        media_type="multipart/x-mixed-replace; boundary=frame",
+    )
