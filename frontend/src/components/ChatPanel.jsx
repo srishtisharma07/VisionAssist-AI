@@ -1,111 +1,69 @@
-import { useState } from "react";
-import { sendCommand } from "../services/api";
+import { useEffect, useState } from "react";
+import { getAssistantState } from "../services/api";
 
-function ChatPanel() {
+export default function ChatPanel() {
 
-    const [command, setCommand] = useState("");
+  const [conversation, setConversation] = useState([]);
 
-    const [messages, setMessages] = useState([]);
+  useEffect(() => {
 
-    async function handleSend() {
+    async function loadConversation() {
 
-        if (!command.trim()) return;
+      const data = await getAssistantState();
 
-        const userMessage = {
-            type: "user",
-            text: command,
-        };
-
-        setMessages(prev => [...prev, userMessage]);
-
-        const currentCommand = command;
-
-        setCommand("");
-
-        const result = await sendCommand(currentCommand);
-
-        const aiMessage = {
-            type: "assistant",
-            text: result.response,
-        };
-
-        setMessages(prev => [...prev, aiMessage]);
+      setConversation(data.conversation || []);
 
     }
 
-    return (
+    loadConversation();
 
-        <div className="bg-slate-800 rounded-xl shadow-lg p-5 h-[420px] flex flex-col">
+    const interval = setInterval(loadConversation, 1000);
 
-            <h2 className="text-xl font-semibold text-white mb-4">
-                💬 AI Assistant
-            </h2>
+    return () => clearInterval(interval);
 
-            <div className="flex-1 overflow-y-auto bg-slate-900 rounded-lg border border-slate-700 p-4">
+  }, []);
 
-                {messages.length === 0 && (
+  return (
 
-                    <div className="text-slate-500">
-                        Ask me anything...
-                    </div>
+    <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
 
-                )}
+      <h2 className="text-2xl font-bold text-white mb-6">
+        Conversation Timeline
+      </h2>
 
-                {messages.map((msg, index) => (
+      <div className="space-y-4 max-h-[450px] overflow-y-auto">
 
-                    <div
-                        key={index}
-                        className={`mb-4 flex ${msg.type === "user"
-                                ? "justify-end"
-                                : "justify-start"
-                            }`}
-                    >
+        {conversation.length === 0 && (
 
-                        <div
-                            className={`${msg.type === "user"
-                                    ? "bg-blue-600"
-                                    : "bg-green-700"
-                                } text-white px-4 py-3 rounded-xl max-w-[80%] whitespace-pre-wrap`}
-                        >
+          <div className="text-slate-500 text-center py-20">
+            No conversation yet...
+          </div>
 
-                            {msg.text}
+        )}
 
-                        </div>
+        {conversation.map((item, index) => (
 
-                    </div>
+          <div
+            key={index}
+            className="bg-slate-800 rounded-2xl p-4 border border-slate-700"
+          >
 
-                ))}
-
+            <div className="text-cyan-400 font-semibold mb-2">
+              👤 {item.user}
             </div>
 
-            <div className="mt-4 flex gap-3">
-
-                <input
-                    type="text"
-                    placeholder="Type your command..."
-                    value={command}
-                    onChange={(e) => setCommand(e.target.value)}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            handleSend();
-                        }
-                    }}
-                    className="flex-1 rounded-lg bg-slate-900 border border-slate-700 text-white px-4 py-3 outline-none focus:border-blue-500"
-                />
-
-                <button
-                    onClick={handleSend}
-                    className="bg-blue-600 hover:bg-blue-700 px-6 rounded-lg text-white font-semibold"
-                >
-                    Send
-                </button>
-
+            <div className="text-white whitespace-pre-wrap">
+              🤖 {item.assistant}
             </div>
 
-        </div>
+          </div>
 
-    );
+        ))}
+
+      </div>
+
+    </div>
+
+  );
 
 }
-
-export default ChatPanel;
