@@ -14,15 +14,18 @@ function App() {
 
       <Routes>
 
-        {/* Landing Page */}
-        <Route path="/" element={<Home />} />
-
-        {/* Dashboard */}
         <Route element={<DashboardLayout />}>
+
+          <Route index element={<Home />} />
+
           <Route path="/assistant" element={<Assistant />} />
+
           <Route path="/gestures" element={<GestureGuide />} />
+
           <Route path="/pdf" element={<PDFAssistant />} />
+
           <Route path="/settings" element={<Settings />} />
+
         </Route>
 
       </Routes>
