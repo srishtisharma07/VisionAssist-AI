@@ -1,98 +1,115 @@
 import { useEffect, useState } from "react";
 import { getAssistantState } from "../services/api";
 
-function AssistantStatus() {
+export default function AssistantStatus() {
+  const [state, setState] = useState({
+    active: false,
+    status: "INACTIVE",
+    last_gesture: "",
+    last_command: "",
+    last_tool: "",
+    last_response: "",
+    last_uploaded_pdf: "",
+  });
 
-    const [state, setState] = useState({
-        active: false,
-        last_gesture: "",
-        last_command: "",
-        last_tool: "",
-        last_response: "",
-        last_uploaded_pdf: "",
-    });
+  useEffect(() => {
+    async function loadState() {
+      const data = await getAssistantState();
+      setState(data);
+    }
 
-    useEffect(() => {
+    loadState();
 
-        async function loadState() {
+    const interval = setInterval(loadState, 1000);
 
-            const data = await getAssistantState();
+    return () => clearInterval(interval);
+  }, []);
 
-            setState(data);
-        }
+  const statusColor = state.active
+    ? "text-green-400"
+    : "text-red-400";
 
-        loadState();
+  return (
+    <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 h-full">
 
-        const interval = setInterval(loadState, 1000);
+      <h2 className="text-2xl font-bold text-white mb-6">
+        Assistant Status
+      </h2>
 
-        return () => clearInterval(interval);
+      <div className="space-y-5">
 
-    }, []);
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">
+            Status
+          </span>
 
-    return (
-
-        <div className="bg-slate-800 rounded-xl shadow-lg p-5">
-
-            <h2 className="text-xl font-semibold text-white mb-5">
-                🤖 Assistant Status
-            </h2>
-
-            <div className="space-y-4 text-white">
-
-                <div>
-                    <span className="font-semibold">
-                        Status:
-                    </span>{" "}
-                    {state.active ? "🟢 Active" : "🔴 Inactive"}
-                </div>
-
-                <div>
-                    <span className="font-semibold">
-                        Gesture:
-                    </span>{" "}
-                    {state.last_gesture || "-"}
-                </div>
-
-                <div>
-                    <span className="font-semibold">
-                        Planner Tool:
-                    </span>{" "}
-                    {state.last_tool || "-"}
-                </div>
-
-                <div>
-                    <span className="font-semibold">
-                        Last Command:
-                    </span>
-
-                    <div className="mt-1 text-slate-300">
-                        {state.last_command || "-"}
-                    </div>
-                </div>
-
-                <div>
-                    <span className="font-semibold">
-                        Last Response:
-                    </span>
-
-                    <div className="mt-1 text-slate-300 whitespace-pre-wrap">
-                        {state.last_response || "-"}
-                    </div>
-                </div>
-
-                <div>
-                    <span className="font-semibold">
-                        Uploaded PDF:
-                    </span>{" "}
-                    {state.last_uploaded_pdf || "-"}
-                </div>
-
-            </div>
-
+          <span className={`font-bold ${statusColor}`}>
+            {state.status || "INACTIVE"}
+          </span>
         </div>
 
-    );
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">
+            Active
+          </span>
 
+          <span className={state.active ? "text-green-400" : "text-red-400"}>
+            {state.active ? "🟢 Yes" : "🔴 No"}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">
+            Gesture
+          </span>
+
+          <span className="text-white font-semibold">
+            {state.last_gesture || "--"}
+          </span>
+        </div>
+
+        <div>
+          <p className="text-slate-400 mb-2">
+            Last Command
+          </p>
+
+          <div className="bg-slate-800 rounded-xl p-3 text-white min-h-[60px]">
+            {state.last_command || "--"}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-slate-400 mb-2">
+            Planner Tool
+          </p>
+
+          <div className="bg-slate-800 rounded-xl p-3 text-white min-h-[50px]">
+            {state.last_tool || "--"}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-slate-400 mb-2">
+            Last Response
+          </p>
+
+          <div className="bg-slate-800 rounded-xl p-3 text-white whitespace-pre-wrap min-h-[100px]">
+            {state.last_response || "--"}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-slate-400 mb-2">
+            Uploaded PDF
+          </p>
+
+          <div className="bg-slate-800 rounded-xl p-3 text-white">
+            {state.last_uploaded_pdf || "--"}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  );
 }
-
-export default AssistantStatus;

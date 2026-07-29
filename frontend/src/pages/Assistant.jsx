@@ -1,8 +1,8 @@
 import WebcamPanel from "../components/WebcamPanel";
-import ChatPanel from "../components/ChatPanel";
 import AssistantStatus from "../components/AssistantStatus";
+import ChatPanel from "../components/ChatPanel";
 
-function Assistant() {
+export default function Assistant() {
   return (
     <div className="space-y-6">
 
@@ -16,26 +16,18 @@ function Assistant() {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6">
 
-        <div className="space-y-6">
-
+        <div className="lg:col-span-2">
           <WebcamPanel />
-
-          <AssistantStatus />
-
         </div>
 
-        <div className="col-span-2">
-
-          <ChatPanel />
-
-        </div>
+        <AssistantStatus />
 
       </div>
+
+      <ChatPanel />
 
     </div>
   );
 }
-
-export default Assistant;

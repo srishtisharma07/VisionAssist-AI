@@ -1,44 +1,42 @@
 import { useState } from "react";
 
-function WebcamPanel() {
-  const [cameraStarted, setCameraStarted] = useState(false);
+export default function WebcamPanel() {
+  const [cameraOn, setCameraOn] = useState(false);
 
   return (
-    <div className="bg-slate-800 rounded-xl shadow-lg p-5 h-[420px]">
+    <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
 
-      <h2 className="text-xl font-semibold text-white mb-4">
-        📷 Live Camera
-      </h2>
+      <div className="flex items-center justify-between mb-5">
 
-      <div className="bg-slate-900 rounded-lg h-[280px] overflow-hidden border border-slate-700">
+        <h2 className="text-2xl font-bold text-white">
+          Live Camera
+        </h2>
 
-        {cameraStarted ? (
+        <button
+          onClick={() => setCameraOn(!cameraOn)}
+          className="bg-cyan-500 hover:bg-cyan-400 px-5 py-2 rounded-xl text-white transition"
+        >
+          {cameraOn ? "Stop Camera" : "Start Camera"}
+        </button>
+
+      </div>
+
+      <div className="rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center">
+
+        {cameraOn ? (
           <img
             src="http://127.0.0.1:8000/video_feed"
             alt="Camera"
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-slate-500">
-            Camera Preview
-          </div>
+          <p className="text-slate-500">
+            Camera is Off
+          </p>
         )}
-
-      </div>
-
-      <div className="mt-5 flex justify-end">
-
-        <button
-          onClick={() => setCameraStarted(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
-        >
-          {cameraStarted ? "Camera Running" : "Start Camera"}
-        </button>
 
       </div>
 
     </div>
   );
 }
-
-export default WebcamPanel;
