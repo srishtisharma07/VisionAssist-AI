@@ -4,29 +4,44 @@ import ChatPanel from "../components/ChatPanel";
 
 export default function Assistant() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
 
-      <div>
-        <h1 className="text-4xl font-bold text-white">
-          AI Assistant
+      {/* Page Header */}
+
+      <section>
+        <p className="text-cyan-400 text-sm uppercase tracking-[0.2em]">
+          AI Control Centre
+        </p>
+
+        <h1 className="text-4xl font-bold text-white mt-2">
+          VisionAssist Assistant
         </h1>
 
-        <p className="text-slate-400 mt-2">
-          Control your computer using gestures and voice.
+        <p className="text-slate-400 mt-3 max-w-2xl">
+          Control your computer using hand gestures and voice commands
+          while monitoring the assistant in real time.
         </p>
-      </div>
+      </section>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      {/* Main Control Area */}
 
-        <div className="lg:col-span-2">
+      <section className="grid xl:grid-cols-3 gap-6">
+
+        <div className="xl:col-span-2">
           <WebcamPanel />
         </div>
 
-        <AssistantStatus />
+        <div>
+          <AssistantStatus />
+        </div>
 
-      </div>
+      </section>
 
-      <ChatPanel />
+      {/* Conversation */}
+
+      <section>
+        <ChatPanel />
+      </section>
 
     </div>
   );
