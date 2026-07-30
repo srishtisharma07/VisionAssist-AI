@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 
 import { getAssistantState, getPdfInfo } from "../services/api";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Settings() {
   const [backendOnline, setBackendOnline] = useState(false);
@@ -21,6 +22,8 @@ export default function Settings() {
   const [pdfInfo, setPdfInfo] = useState({
     total_pdfs: 0,
   });
+
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     async function loadSystemInfo() {
@@ -78,6 +81,47 @@ export default function Settings() {
         <p className="text-slate-400 mt-3">
           Monitor the VisionAssist AI environment and connected services.
         </p>
+      </section>
+
+      {/* Appearance Section */}
+      <section className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
+        <div className="flex items-center justify-between">
+
+          <div>
+            <h2 className="text-xl font-bold text-white">
+              Appearance
+            </h2>
+
+            <p className="text-slate-400 text-sm mt-1">
+              Choose how VisionAssist AI looks.
+            </p>
+          </div>
+
+          <button
+            onClick={toggleTheme}
+            className="relative w-16 h-8 rounded-full bg-slate-700 transition"
+            aria-label="Toggle theme"
+          >
+            <div
+              className={`absolute top-1 w-6 h-6 rounded-full bg-cyan-400 transition-all duration-300 ${
+                theme === "light" ? "left-9" : "left-1"
+              }`}
+            />
+          </button>
+
+        </div>
+
+        <div className="mt-5 flex items-center gap-3">
+
+          <span className="text-slate-400 text-sm">
+            Current theme:
+          </span>
+
+          <span className="text-cyan-400 font-semibold capitalize">
+            {theme}
+          </span>
+
+        </div>
       </section>
 
       {/* System Status */}

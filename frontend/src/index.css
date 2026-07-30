@@ -4,13 +4,106 @@ html,
 body,
 #root {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #0f172a;
   font-family: Inter, sans-serif;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* =========================
+   DARK THEME
+========================= */
+
+.dark-theme {
+  --app-bg: #050505;
+  --panel-bg: #0d0d0d;
+  --panel-soft: #151515;
+  --border-color: #27272a;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+}
+
+/* =========================
+   LIGHT THEME
+========================= */
+
+.light-theme {
+  --app-bg: #f5f7fa;
+  --panel-bg: #ffffff;
+  --panel-soft: #eef2f7;
+  --border-color: #d7dde5;
+  --text-main: #111827;
+  --text-muted: #64748b;
+}
+
+body {
+  background: var(--app-bg);
+  color: var(--text-main);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* =========================
+   LIGHT THEME OVERRIDES
+========================= */
+
+.light-theme .bg-slate-950 {
+  background-color: #ffffff;
+}
+
+.light-theme .bg-slate-900 {
+  background-color: #f8fafc;
+}
+
+.light-theme .bg-slate-800 {
+  background-color: #eef2f7;
+}
+
+.light-theme .border-slate-800 {
+  border-color: #d7dde5;
+}
+
+.light-theme .border-slate-700 {
+  border-color: #cbd5e1;
+}
+
+.light-theme .text-white {
+  color: #111827;
+}
+
+.light-theme .text-slate-300 {
+  color: #475569;
+}
+
+.light-theme .text-slate-400 {
+  color: #64748b;
+}
+
+.light-theme .text-slate-500 {
+  color: #64748b;
+}
+
+.light-theme .text-slate-600 {
+  color: #94a3b8;
+}
+
+/* Hover states */
+
+.light-theme .hover\:bg-slate-800:hover {
+  background-color: #e2e8f0;
+}
+
+.light-theme .hover\:bg-slate-700:hover {
+  background-color: #dbe3ec;
+}
+
+/* Keep the page background consistent */
+
+.light-theme .min-h-screen {
+  background-color: var(--app-bg);
 }
