@@ -24,7 +24,7 @@ body,
   --panel-soft: #1a1a16;
   --border-color: #2a2a24;
 
-  --text-main: #f5f3ea;
+  --text-main: #d6cfb9;
   --text-muted: #a7a59a;
 
   --accent: #7c8450;
@@ -37,13 +37,13 @@ body,
 ========================= */
 
 .light-theme {
-  --app-bg: #f4f1e8;
-  --panel-bg: #fffdf7;
-  --panel-soft: #eae7da;
-  --border-color: #d7d3c4;
+  --app-bg: #f2eee3;
+  --panel-bg: #fbf8ef;
+  --panel-soft: #e8e3d5;
+  --border-color: #d3cdbd;
 
-  --text-main: #1c1c18;
-  --text-muted: #6f6d63;
+  --text-main: #2a2923;
+  --text-muted: #77746a;
 
   --accent: #657044;
   --accent-hover: #566038;
@@ -91,15 +91,15 @@ body {
 /* Light theme */
 
 .light-theme .bg-slate-950 {
-  background-color: #f4f1e8;
+  background-color: #f2eee3;
 }
 
 .light-theme .bg-slate-900 {
-  background-color: #fffdf7;
+  background-color: #fbf8ef;
 }
 
 .light-theme .bg-slate-800 {
-  background-color: #eae7da;
+  background-color: #e8e3d5;
 }
 
 .light-theme .border-slate-800,
@@ -108,7 +108,7 @@ body {
 }
 
 .light-theme .text-white {
-  color: #1c1c18;
+  color: #2a2923;
 }
 
 .light-theme .text-slate-300,
