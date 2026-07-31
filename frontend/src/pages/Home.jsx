@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import {
+  ArrowRight,
   Bot,
   Hand,
   FileText,
   Activity,
-  ArrowRight,
+  Sparkles,
 } from "lucide-react";
+
 import { Link } from "react-router-dom";
 import { getAssistantState } from "../services/api";
 
@@ -17,7 +19,6 @@ export default function Home() {
     last_command: "",
     last_tool: "",
     last_response: "",
-    last_uploaded_pdf: "",
     conversation: [],
   });
 
@@ -32,7 +33,6 @@ export default function Home() {
         last_command: data.last_command || "",
         last_tool: data.last_tool || "",
         last_response: data.last_response || "",
-        last_uploaded_pdf: data.last_uploaded_pdf || "",
         conversation: data.conversation || [],
       });
     }
@@ -44,189 +44,294 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const statusColor = state.active
-    ? "text-green-400"
-    : "text-red-400";
+  const features = [
+    {
+      icon: Hand,
+      title: "Gesture Control",
+      description:
+        "Interact with the assistant using intuitive hand gestures.",
+    },
+    {
+      icon: Bot,
+      title: "Agentic AI",
+      description:
+        "Plan and execute computer tasks using intelligent AI orchestration.",
+    },
+    {
+      icon: FileText,
+      title: "PDF Assistant",
+      description:
+        "Upload and extract information from your documents.",
+    },
+    {
+      icon: Activity,
+      title: "Live Monitoring",
+      description:
+        "Track gestures, commands, tools and responses in real time.",
+    },
+  ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
 
-      {/* Welcome */}
+      {/* Hero */}
 
-      <section>
-        <p className="text-cyan-400 text-sm uppercase tracking-widest">
-          Control Centre
-        </p>
+      <section className="relative overflow-hidden rounded-[2rem] border border-[var(--border-color)] bg-[var(--panel-bg)] px-8 py-14 lg:px-14 lg:py-20">
 
-        <h1 className="text-4xl font-bold text-white mt-2">
-          Welcome to VisionAssist AI
-        </h1>
+        <div className="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-[var(--accent)]/10 blur-3xl" />
+        <div className="absolute -bottom-24 -left-24 w-72 h-72 rounded-full bg-[var(--accent)]/5 blur-3xl" />
 
-        <p className="text-slate-400 mt-3 max-w-2xl">
-          Monitor your assistant, gestures, commands and document activity
-          from one intelligent workspace.
-        </p>
-      </section>
+        <div className="relative max-w-4xl">
 
-      {/* Status Cards */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--panel-soft)] px-4 py-2">
 
-      <section className="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+            <Sparkles
+              size={15}
+              className="text-[var(--accent)]"
+            />
 
-        <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
-          <div className="flex items-center justify-between">
-            <Bot className="text-cyan-400" size={28} />
-
-            <span className={state.active ? "text-green-400" : "text-red-400"}>
-              {state.active ? "ONLINE" : "OFFLINE"}
+            <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
+              Agentic AI Personal Assistant
             </span>
+
           </div>
 
-          <p className="text-slate-400 mt-5">
-            Assistant
-          </p>
-
-          <p className={`text-2xl font-bold mt-1 ${statusColor}`}>
-            {state.status}
-          </p>
-        </div>
-
-        <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
-          <div className="flex items-center justify-between">
-            <Hand className="text-green-400" size={28} />
-          </div>
-
-          <p className="text-slate-400 mt-5">
-            Current Gesture
-          </p>
-
-          <p className="text-2xl font-bold text-white mt-1">
-            {state.last_gesture || "--"}
-          </p>
-        </div>
-
-        <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
-          <div className="flex items-center justify-between">
-            <Activity className="text-purple-400" size={28} />
-          </div>
-
-          <p className="text-slate-400 mt-5">
-            Last Tool
-          </p>
-
-          <p className="text-2xl font-bold text-white mt-1 truncate">
-            {state.last_tool || "--"}
-          </p>
-        </div>
-
-        <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
-          <div className="flex items-center justify-between">
-            <FileText className="text-yellow-400" size={28} />
-          </div>
-
-          <p className="text-slate-400 mt-5">
-            Conversations
-          </p>
-
-          <p className="text-2xl font-bold text-white mt-1">
-            {state.conversation.length}
-          </p>
-        </div>
-
-      </section>
-
-      {/* Main Information */}
-
-      <section className="grid lg:grid-cols-2 gap-6">
-
-        <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
-
-          <h2 className="text-xl font-bold text-white">
-            Latest Command
+          <h2 className="mt-7 text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.02] text-[var(--text-main)]">
+            Control your computer
+            <span className="block text-[var(--accent)]">
+              without touching it.
+            </span>
           </h2>
 
-          <div className="bg-slate-950 rounded-2xl p-5 mt-5 min-h-[120px]">
+          <p className="mt-7 max-w-2xl text-base md:text-lg leading-8 text-[var(--text-muted)]">
+            VisionAssist AI combines hand gestures, voice commands,
+            computer vision and agentic AI to turn natural interaction
+            into real computer actions.
+          </p>
 
-            <p className="text-cyan-400 text-sm">
-              COMMAND
-            </p>
-
-            <p className="text-white text-lg mt-2">
-              {state.last_command || "No command yet."}
-            </p>
-
-          </div>
-
-          <div className="bg-slate-950 rounded-2xl p-5 mt-4">
-
-            <p className="text-purple-400 text-sm">
-              RESPONSE
-            </p>
-
-            <p className="text-slate-300 mt-2 whitespace-pre-wrap">
-              {state.last_response || "No response yet."}
-            </p>
-
-          </div>
-
-        </div>
-
-        <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6">
-
-          <h2 className="text-xl font-bold text-white">
-            Quick Access
-          </h2>
-
-          <div className="grid gap-4 mt-6">
+          <div className="mt-9 flex flex-wrap gap-4">
 
             <Link
               to="/assistant"
-              className="flex items-center justify-between bg-slate-800 hover:bg-slate-700 rounded-2xl p-5 transition"
+              className="inline-flex items-center gap-2 rounded-xl bg-[var(--accent)] px-6 py-3.5 font-semibold text-white transition hover:opacity-90"
             >
-              <div>
-                <p className="text-white font-semibold">
-                  Open Assistant
-                </p>
-
-                <p className="text-slate-400 text-sm mt-1">
-                  Use gestures and voice commands
-                </p>
-              </div>
-
-              <ArrowRight className="text-cyan-400" />
+              Launch Assistant
+              <ArrowRight size={18} />
             </Link>
 
             <Link
               to="/gestures"
-              className="flex items-center justify-between bg-slate-800 hover:bg-slate-700 rounded-2xl p-5 transition"
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--border-color)] bg-[var(--panel-soft)] px-6 py-3.5 font-semibold text-[var(--text-main)] transition hover:border-[var(--accent)]"
             >
-              <div>
-                <p className="text-white font-semibold">
-                  Gesture Guide
+              Explore Gestures
+            </Link>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* Live Overview */}
+
+      <section>
+
+        <div className="mb-6">
+
+          <p className="page-eyebrow">
+            Live Overview
+          </p>
+
+          <h2 className="text-2xl font-bold text-[var(--text-main)] mt-1">
+            Assistant at a glance
+          </h2>
+
+        </div>
+
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+
+          <div className="bg-[var(--panel-bg)] border border-[var(--border-color)] rounded-3xl p-6">
+
+            <p className="text-sm text-[var(--text-muted)]">
+              Assistant State
+            </p>
+
+            <p className="text-2xl font-bold text-[var(--accent)] mt-3">
+              {state.status}
+            </p>
+
+          </div>
+
+          <div className="bg-[var(--panel-bg)] border border-[var(--border-color)] rounded-3xl p-6">
+
+            <p className="text-sm text-[var(--text-muted)]">
+              Current Gesture
+            </p>
+
+            <p className="text-2xl font-bold text-[var(--text-main)] mt-3 truncate">
+              {state.last_gesture || "--"}
+            </p>
+
+          </div>
+
+          <div className="bg-[var(--panel-bg)] border border-[var(--border-color)] rounded-3xl p-6">
+
+            <p className="text-sm text-[var(--text-muted)]">
+              Last Tool
+            </p>
+
+            <p className="text-2xl font-bold text-[var(--text-main)] mt-3 truncate">
+              {state.last_tool || "--"}
+            </p>
+
+          </div>
+
+          <div className="bg-[var(--panel-bg)] border border-[var(--border-color)] rounded-3xl p-6">
+
+            <p className="text-sm text-[var(--text-muted)]">
+              Conversations
+            </p>
+
+            <p className="text-2xl font-bold text-[var(--text-main)] mt-3">
+              {state.conversation.length}
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      {/* Features */}
+
+      <section>
+
+        <div className="mb-6">
+
+          <p className="page-eyebrow">
+            Core Capabilities
+          </p>
+
+          <h2 className="text-2xl font-bold text-[var(--text-main)] mt-1">
+            Built for natural interaction
+          </h2>
+
+        </div>
+
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5">
+
+          {features.map((feature) => {
+
+            const Icon = feature.icon;
+
+            return (
+              <div
+                key={feature.title}
+                className="group bg-[var(--panel-bg)] border border-[var(--border-color)] rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[var(--accent)]"
+              >
+
+                <div className="w-11 h-11 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center">
+
+                  <Icon
+                    size={22}
+                    className="text-[var(--accent)]"
+                  />
+
+                </div>
+
+                <h3 className="text-lg font-bold text-[var(--text-main)] mt-5">
+                  {feature.title}
+                </h3>
+
+                <p className="text-sm leading-6 text-[var(--text-muted)] mt-2">
+                  {feature.description}
                 </p>
 
-                <p className="text-slate-400 text-sm mt-1">
-                  Learn the supported gestures
-                </p>
               </div>
+            );
 
-              <ArrowRight className="text-cyan-400" />
+          })}
+
+        </div>
+
+      </section>
+
+      {/* Latest Activity */}
+
+      <section className="grid lg:grid-cols-2 gap-5">
+
+        <div className="bg-[var(--panel-bg)] border border-[var(--border-color)] rounded-3xl p-6">
+
+          <p className="page-eyebrow">
+            Latest Activity
+          </p>
+
+          <h2 className="text-xl font-bold text-[var(--text-main)] mt-1">
+            Last command
+          </h2>
+
+          <div className="mt-5 bg-[var(--panel-soft)] border border-[var(--border-color)] rounded-2xl p-5">
+
+            <p className="text-[var(--text-main)]">
+              {state.last_command || "No command recorded yet."}
+            </p>
+
+            <p className="text-sm leading-6 text-[var(--text-muted)] mt-3">
+              {state.last_response || "No assistant response yet."}
+            </p>
+
+          </div>
+
+        </div>
+
+        <div className="bg-[var(--panel-bg)] border border-[var(--border-color)] rounded-3xl p-6">
+
+          <p className="page-eyebrow">
+            Quick Actions
+          </p>
+
+          <div className="grid gap-3 mt-5">
+
+            <Link
+              to="/assistant"
+              className="flex items-center justify-between rounded-2xl bg-[var(--panel-soft)] border border-[var(--border-color)] px-5 py-4 transition hover:border-[var(--accent)]"
+            >
+              <span className="font-semibold text-[var(--text-main)]">
+                Open Assistant
+              </span>
+
+              <ArrowRight
+                size={18}
+                className="text-[var(--accent)]"
+              />
             </Link>
 
             <Link
               to="/pdf"
-              className="flex items-center justify-between bg-slate-800 hover:bg-slate-700 rounded-2xl p-5 transition"
+              className="flex items-center justify-between rounded-2xl bg-[var(--panel-soft)] border border-[var(--border-color)] px-5 py-4 transition hover:border-[var(--accent)]"
             >
-              <div>
-                <p className="text-white font-semibold">
-                  PDF Assistant
-                </p>
+              <span className="font-semibold text-[var(--text-main)]">
+                Open PDF Workspace
+              </span>
 
-                <p className="text-slate-400 text-sm mt-1">
-                  Upload and analyse documents
-                </p>
-              </div>
+              <ArrowRight
+                size={18}
+                className="text-[var(--accent)]"
+              />
+            </Link>
 
-              <ArrowRight className="text-cyan-400" />
+            <Link
+              to="/settings"
+              className="flex items-center justify-between rounded-2xl bg-[var(--panel-soft)] border border-[var(--border-color)] px-5 py-4 transition hover:border-[var(--accent)]"
+            >
+              <span className="font-semibold text-[var(--text-main)]">
+                System Settings
+              </span>
+
+              <ArrowRight
+                size={18}
+                className="text-[var(--accent)]"
+              />
             </Link>
 
           </div>
