@@ -9,15 +9,15 @@ export default function Assistant() {
       {/* Page Header */}
 
       <section>
-        <p className="text-cyan-400 text-sm uppercase tracking-[0.2em]">
+        <p className="page-eyebrow">
           AI Control Centre
         </p>
 
-        <h1 className="text-4xl font-bold text-white mt-2">
+        <h1 className="page-title">
           VisionAssist Assistant
         </h1>
 
-        <p className="text-slate-400 mt-3 max-w-2xl">
+        <p className="page-description">
           Control your computer using hand gestures and voice commands
           while monitoring the assistant in real time.
         </p>

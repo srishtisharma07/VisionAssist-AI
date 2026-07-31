@@ -123,15 +123,15 @@ export default function PDFAssistant() {
       {/* Header */}
 
       <section>
-        <p className="text-sm uppercase tracking-[0.2em] text-[var(--accent)]">
+        <p className="page-eyebrow">
           Document Workspace
         </p>
 
-        <h1 className="text-4xl font-bold text-[var(--text-main)] mt-2">
+        <h1 className="page-title">
           PDF Assistant
         </h1>
 
-        <p className="text-[var(--text-muted)] mt-3 max-w-2xl">
+        <p className="page-description">
           Upload documents and prepare them for AI-powered analysis.
         </p>
       </section>

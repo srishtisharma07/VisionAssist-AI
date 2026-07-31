@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 html,
@@ -7,7 +8,6 @@ body,
   min-height: 100%;
   margin: 0;
   padding: 0;
-  font-family: Inter, sans-serif;
 }
 
 * {
@@ -53,6 +53,7 @@ body,
 body {
   background: var(--app-bg);
   color: var(--text-main);
+  font-family: "Manrope", sans-serif;
 
   transition:
     background-color 0.3s ease,
@@ -143,4 +144,28 @@ body {
 
 .light-theme .hover\:bg-cyan-400:hover {
   background-color: #566038;
+}
+
+.page-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.page-title {
+  margin-top: 0.4rem;
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  line-height: 1.1;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.page-description {
+  margin-top: 0.8rem;
+  max-width: 46rem;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-muted);
 }

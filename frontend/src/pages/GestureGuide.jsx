@@ -66,17 +66,17 @@ export default function GestureGuide() {
     <div className="space-y-10">
 
       <div className="text-center">
+        <p className="page-eyebrow">
+          Gesture Interface
+        </p>
 
-        <h1 className="text-5xl font-bold text-white">
+        <h1 className="page-title">
           Gesture Control Centre
         </h1>
 
-        <p className="text-slate-400 mt-4 max-w-3xl mx-auto">
-          VisionAssist AI uses intuitive hand gestures to activate,
-          control and interact with your personal AI assistant without
-          touching the keyboard or mouse.
+        <p className="page-description">
+          Learn the supported hand gestures for controlling VisionAssist AI.
         </p>
-
       </div>
 
       <div className="grid lg:grid-cols-2 xl:grid-cols-3 gap-8">
