@@ -19,12 +19,17 @@ body,
 ========================= */
 
 .dark-theme {
-  --app-bg: #050505;
-  --panel-bg: #0d0d0d;
-  --panel-soft: #151515;
-  --border-color: #27272a;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
+  --app-bg: #080808;
+  --panel-bg: #11110f;
+  --panel-soft: #1a1a16;
+  --border-color: #2a2a24;
+
+  --text-main: #f5f3ea;
+  --text-muted: #a7a59a;
+
+  --accent: #7c8450;
+  --accent-hover: #8c955c;
+  --accent-soft: rgba(124, 132, 80, 0.14);
 }
 
 /* =========================
@@ -32,78 +37,110 @@ body,
 ========================= */
 
 .light-theme {
-  --app-bg: #f5f7fa;
-  --panel-bg: #ffffff;
-  --panel-soft: #eef2f7;
-  --border-color: #d7dde5;
-  --text-main: #111827;
-  --text-muted: #64748b;
+  --app-bg: #f4f1e8;
+  --panel-bg: #fffdf7;
+  --panel-soft: #eae7da;
+  --border-color: #d7d3c4;
+
+  --text-main: #1c1c18;
+  --text-muted: #6f6d63;
+
+  --accent: #657044;
+  --accent-hover: #566038;
+  --accent-soft: rgba(101, 112, 68, 0.12);
 }
 
 body {
   background: var(--app-bg);
   color: var(--text-main);
+
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
 }
 
-/* =========================
-   LIGHT THEME OVERRIDES
-========================= */
+/* Existing Tailwind dark colors → new palette */
+
+.dark-theme .bg-slate-950 {
+  background-color: #080808;
+}
+
+.dark-theme .bg-slate-900 {
+  background-color: #11110f;
+}
+
+.dark-theme .bg-slate-800 {
+  background-color: #1a1a16;
+}
+
+.dark-theme .border-slate-800,
+.dark-theme .border-slate-700 {
+  border-color: #2a2a24;
+}
+
+.dark-theme .text-white {
+  color: #f5f3ea;
+}
+
+.dark-theme .text-slate-300,
+.dark-theme .text-slate-400,
+.dark-theme .text-slate-500 {
+  color: #a7a59a;
+}
+
+/* Light theme */
 
 .light-theme .bg-slate-950 {
-  background-color: #ffffff;
+  background-color: #f4f1e8;
 }
 
 .light-theme .bg-slate-900 {
-  background-color: #f8fafc;
+  background-color: #fffdf7;
 }
 
 .light-theme .bg-slate-800 {
-  background-color: #eef2f7;
+  background-color: #eae7da;
 }
 
-.light-theme .border-slate-800 {
-  border-color: #d7dde5;
-}
-
+.light-theme .border-slate-800,
 .light-theme .border-slate-700 {
-  border-color: #cbd5e1;
+  border-color: #d7d3c4;
 }
 
 .light-theme .text-white {
-  color: #111827;
+  color: #1c1c18;
 }
 
-.light-theme .text-slate-300 {
-  color: #475569;
-}
-
-.light-theme .text-slate-400 {
-  color: #64748b;
-}
-
+.light-theme .text-slate-300,
+.light-theme .text-slate-400,
 .light-theme .text-slate-500 {
-  color: #64748b;
+  color: #6f6d63;
 }
 
-.light-theme .text-slate-600 {
-  color: #94a3b8;
+/* Common blue/cyan accents → olive */
+
+.dark-theme .text-cyan-400,
+.dark-theme .text-cyan-300 {
+  color: #9aa66a;
 }
 
-/* Hover states */
-
-.light-theme .hover\:bg-slate-800:hover {
-  background-color: #e2e8f0;
+.light-theme .text-cyan-400,
+.light-theme .text-cyan-300 {
+  color: #657044;
 }
 
-.light-theme .hover\:bg-slate-700:hover {
-  background-color: #dbe3ec;
+.dark-theme .bg-cyan-500 {
+  background-color: #7c8450;
 }
 
-/* Keep the page background consistent */
+.light-theme .bg-cyan-500 {
+  background-color: #657044;
+}
 
-.light-theme .min-h-screen {
-  background-color: var(--app-bg);
+.dark-theme .hover\:bg-cyan-400:hover {
+  background-color: #8c955c;
+}
+
+.light-theme .hover\:bg-cyan-400:hover {
+  background-color: #566038;
 }
