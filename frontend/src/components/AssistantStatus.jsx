@@ -1,4 +1,13 @@
 import { useEffect, useState } from "react";
+import {
+  Activity,
+  CheckCircle2,
+  Circle,
+  Command,
+  MessageSquare,
+  MousePointer2,
+} from "lucide-react";
+
 import { getAssistantState } from "../services/api";
 
 export default function AssistantStatus() {
@@ -25,88 +34,150 @@ export default function AssistantStatus() {
     return () => clearInterval(interval);
   }, []);
 
-  const statusColor = state.active
-    ? "text-green-400"
-    : "text-red-400";
+  const isActive = state.active;
 
   return (
-    <div className="bg-slate-900 border border-slate-700 rounded-3xl p-6 h-full">
+    <div className="bg-[var(--panel-bg)] border border-[var(--border-color)] rounded-3xl p-6 h-full transition-colors duration-300">
 
-      <h2 className="text-2xl font-bold text-white mb-6">
-        Assistant Status
-      </h2>
+      {/* Header */}
 
-      <div className="space-y-5">
+      <div className="flex items-center justify-between mb-6">
 
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400">
-            Status
-          </span>
+        <div className="flex items-center gap-3">
 
-          <span className={`font-bold ${statusColor}`}>
+          <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] flex items-center justify-center">
+            <Activity
+              size={20}
+              className="text-[var(--accent)]"
+            />
+          </div>
+
+          <div>
+            <h2 className="text-xl font-bold text-[var(--text-main)]">
+              Assistant Status
+            </h2>
+
+            <p className="text-xs text-[var(--text-muted)] mt-1">
+              Live system state
+            </p>
+          </div>
+
+        </div>
+
+        <div
+          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${
+            isActive
+              ? "bg-green-500/10 text-green-400"
+              : "bg-[var(--panel-soft)] text-[var(--text-muted)]"
+          }`}
+        >
+          {isActive ? (
+            <CheckCircle2 size={15} />
+          ) : (
+            <Circle size={15} />
+          )}
+
+          {isActive ? "ACTIVE" : "INACTIVE"}
+        </div>
+
+      </div>
+
+      {/* Status */}
+
+      <div className="grid grid-cols-2 gap-4">
+
+        <div className="bg-[var(--panel-soft)] border border-[var(--border-color)] rounded-2xl p-4">
+
+          <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
+            State
+          </p>
+
+          <p className="text-lg font-semibold text-[var(--accent)] mt-2">
             {state.status || "INACTIVE"}
-          </span>
+          </p>
+
         </div>
 
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400">
-            Active
-          </span>
+        <div className="bg-[var(--panel-soft)] border border-[var(--border-color)] rounded-2xl p-4">
 
-          <span className={state.active ? "text-green-400" : "text-red-400"}>
-            {state.active ? "🟢 Yes" : "🔴 No"}
-          </span>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-slate-400">
+          <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
             Gesture
-          </span>
+          </p>
 
-          <span className="text-white font-semibold">
+          <p className="text-lg font-semibold text-[var(--text-main)] mt-2 truncate">
             {state.last_gesture || "--"}
-          </span>
+          </p>
+
         </div>
 
-        <div>
-          <p className="text-slate-400 mb-2">
+      </div>
+
+      {/* Last Command */}
+
+      <div className="mt-4 bg-[var(--panel-soft)] border border-[var(--border-color)] rounded-2xl p-4">
+
+        <div className="flex items-center gap-2">
+
+          <Command
+            size={17}
+            className="text-[var(--accent)]"
+          />
+
+          <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
             Last Command
           </p>
 
-          <div className="bg-slate-800 rounded-xl p-3 text-white min-h-[60px]">
-            {state.last_command || "--"}
-          </div>
         </div>
 
-        <div>
-          <p className="text-slate-400 mb-2">
+        <p className="text-[var(--text-main)] mt-3 leading-6">
+          {state.last_command || "No command yet."}
+        </p>
+
+      </div>
+
+      {/* Tool */}
+
+      <div className="mt-4 bg-[var(--panel-soft)] border border-[var(--border-color)] rounded-2xl p-4">
+
+        <div className="flex items-center gap-2">
+
+          <MousePointer2
+            size={17}
+            className="text-[var(--accent)]"
+          />
+
+          <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
             Planner Tool
           </p>
 
-          <div className="bg-slate-800 rounded-xl p-3 text-white min-h-[50px]">
-            {state.last_tool || "--"}
-          </div>
         </div>
 
-        <div>
-          <p className="text-slate-400 mb-2">
+        <p className="text-[var(--text-main)] mt-3">
+          {state.last_tool || "--"}
+        </p>
+
+      </div>
+
+      {/* Response */}
+
+      <div className="mt-4 bg-[var(--panel-soft)] border border-[var(--border-color)] rounded-2xl p-4">
+
+        <div className="flex items-center gap-2">
+
+          <MessageSquare
+            size={17}
+            className="text-[var(--accent)]"
+          />
+
+          <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
             Last Response
           </p>
 
-          <div className="bg-slate-800 rounded-xl p-3 text-white whitespace-pre-wrap min-h-[100px]">
-            {state.last_response || "--"}
-          </div>
         </div>
 
-        <div>
-          <p className="text-slate-400 mb-2">
-            Uploaded PDF
-          </p>
-
-          <div className="bg-slate-800 rounded-xl p-3 text-white">
-            {state.last_uploaded_pdf || "--"}
-          </div>
-        </div>
+        <p className="text-[var(--text-main)] mt-3 whitespace-pre-wrap leading-6">
+          {state.last_response || "No response yet."}
+        </p>
 
       </div>
 
