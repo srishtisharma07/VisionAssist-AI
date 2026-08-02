@@ -31,11 +31,6 @@ class AgentOrchestrator:
                 result["response"]
             )
 
-            assistant_state.add_conversation(
-                user=command,
-                assistant=result["response"],
-            )
-
             assistant_state.set_status(
                 AssistantStatus.SPEAKING
             )

@@ -51,8 +51,8 @@ class SpeechToText:
 
             audio = self.recognizer.listen(
                 source,
-                timeout=5,
-                phrase_time_limit=6,
+                timeout=10,
+                phrase_time_limit=10,
             )
 
         try:
