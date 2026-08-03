@@ -277,11 +277,11 @@ class GestureDetector:
                 cv2.putText(frame, "Thumbs Up = Execute", (20, 195), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
                 cv2.putText(frame, "Thumbs Down = Speak Again", (320, 195), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
 
-            cv2.imshow("VisionAssist AI", frame)
+            # cv2.imshow("VisionAssist AI", frame)
 
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord("q"):
-                break
+            # key = cv2.waitKey(1) & 0xFF
+            # if key == ord("q"):
+            #     break
 
         cap.release()
         cv2.destroyAllWindows()
